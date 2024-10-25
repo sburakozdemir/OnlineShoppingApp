@@ -1,4 +1,5 @@
-﻿using OnlineShoppingApp.Data.Enums;
+﻿using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using OnlineShoppingApp.Data.Enums;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -18,5 +19,29 @@ namespace OnlineShoppingApp.Data.Entities
         public Role Role { get; set; }
 
         public virtual ICollection<OrderEntity> Orders { get; set; } // Kullanıcının siparişleri
+    }
+    public class UserConfiguration : BaseConfiguration<UserEntity>
+    {
+        public override void Configure(EntityTypeBuilder<UserEntity> builder)
+        {
+            builder.Property(x => x.FirstName)
+                .IsRequired()
+                .HasMaxLength(50);
+
+            builder.Property(x => x.LastName)
+                .IsRequired()
+                .HasMaxLength(50);
+
+            builder.Property(x => x.Email)
+                .IsRequired()
+                .HasMaxLength(100);
+
+            builder.Property(x => x.PhoneNumber)
+                .IsRequired(false)
+                .HasMaxLength(15);
+
+            // Diğer konfigürasyonlar
+            base.Configure(builder);
+        }
     }
 }

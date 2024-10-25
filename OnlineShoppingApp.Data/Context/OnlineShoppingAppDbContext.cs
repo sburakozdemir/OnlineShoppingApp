@@ -21,26 +21,12 @@ namespace OnlineShoppingApp.Data.Context
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.ApplyConfiguration(new UserConfiguration());
+            modelBuilder.ApplyConfiguration(new ProductConfiguration());
+            modelBuilder.ApplyConfiguration(new OrderConfiguration());
+            modelBuilder.ApplyConfiguration(new OrderProductConfiguration());
+
             base.OnModelCreating(modelBuilder);
-
-            // UserEntity konfigürasyonu
-            modelBuilder.Entity<UserEntity>()
-                .HasIndex(u => u.Email)
-                .IsUnique();
-
-            // OrderProductEntity konfigürasyonu
-            modelBuilder.Entity<OrderProductEntity>()
-                .HasKey(op => new { op.OrderId, op.ProductId });
-
-            modelBuilder.Entity<OrderProductEntity>()
-                .HasOne(op => op.Order)
-                .WithMany(o => o.OrderProducts)
-                .HasForeignKey(op => op.OrderId);
-
-            modelBuilder.Entity<OrderProductEntity>()
-                .HasOne(op => op.Product)
-                .WithMany(p => p.OrderProducts)
-                .HasForeignKey(op => op.ProductId);
         }
     }
 }

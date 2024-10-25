@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -16,5 +18,25 @@ namespace OnlineShoppingApp.Data.Entities
 
         public virtual ICollection<OrderProductEntity> OrderProducts { get; set; }
 
+    }
+
+    public class ProductConfiguration : BaseConfiguration<ProductEntity>
+    {
+        public override void Configure(EntityTypeBuilder<ProductEntity> builder)
+        {
+            builder.Property(x => x.ProductName)
+                .IsRequired()
+                .HasMaxLength(100);
+
+            builder.Property(x => x.Price)
+                .IsRequired()
+                .HasColumnType("decimal(18,2)");
+
+            builder.Property(x => x.StockQuantity)
+                .IsRequired();
+
+            // Diğer konfigürasyonlar
+            base.Configure(builder);
+        }
     }
 }

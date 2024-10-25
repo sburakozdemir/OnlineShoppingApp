@@ -6,8 +6,9 @@ using System.Threading.Tasks;
 
 namespace OnlineShoppingApp.Data.Enums
 {
-    public enum UserType
+    public enum Role
     {
-        Customer, Admin
+        Admin,
+        Customer
     }
 }

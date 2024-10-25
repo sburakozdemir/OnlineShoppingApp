@@ -1,5 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using OnlineShoppingApp.Data.Context;
+using OnlineShoppingApp.Data.Repositories;
+using OnlineShoppingApp.Data.UnitOfWork;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,6 +15,10 @@ builder.Services.AddSwaggerGen();
 var connectionString = builder.Configuration.GetConnectionString("default");
 
 builder.Services.AddDbContext<OnlineShoppingAppDbContext>(options => options.UseSqlServer(connectionString));
+
+builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));// Generic olduðu için Type of kullanýldý
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

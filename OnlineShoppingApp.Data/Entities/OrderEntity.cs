@@ -31,7 +31,7 @@ namespace OnlineShoppingApp.Data.Entities
 
             // Müşteri ile ilişki
             builder.HasOne(x => x.Customer) // Siparişi veren müşteri
-                .WithMany() // Eğer UserEntity içerisinde OrderEntity'yi referans ediyorsanız buraya <OrderEntity> ekleyebilirsiniz.
+                .WithMany() 
                 .HasForeignKey(x => x.CustomerId);
 
             // Diğer konfigürasyonlar

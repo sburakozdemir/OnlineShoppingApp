@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using OnlineShoppingApp.Business.DataProtection;
+using OnlineShoppingApp.Business.Operations.Product;
 using OnlineShoppingApp.Business.Operations.User;
 using OnlineShoppingApp.Business.Services;
 using OnlineShoppingApp.Data.Context;
@@ -90,6 +91,7 @@ builder.Services.AddDbContext<OnlineShoppingAppDbContext>(options =>
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));// Generic olduðu için Type of kullanýldý
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<IUserService, UserManager>();
+builder.Services.AddScoped<IProductService, ProductService>();
 
 var app = builder.Build();
 

@@ -1,5 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore.Storage;
 using OnlineShoppingApp.Data.Context;
+using OnlineShoppingApp.Data.Entities;
+using OnlineShoppingApp.Data.Repositories;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -45,6 +47,11 @@ namespace OnlineShoppingApp.Data.UnitOfWork
         public async Task<int> SaveChangesAsync()
         {
             return await _db.SaveChangesAsync();
+        }
+
+        public IRepository<TEntity> Repository<TEntity>() where TEntity : BaseEntity
+        {
+            return new Repository<TEntity>(_db);
         }
     }
 }

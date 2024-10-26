@@ -71,5 +71,16 @@ namespace OnlineShoppingApp.Data.Repositories
             _dbSet.Update(entity);
 
         }
+
+        public async Task<TEntity> GetByIdAsync(int id) 
+        {
+            return await _dbSet.FindAsync(id); 
+        }
+
+        public async Task AddAsync(TEntity entity) 
+        {
+            entity.CreatedDate = DateTime.Now;
+            await _dbSet.AddAsync(entity); 
+        }
     }
 }

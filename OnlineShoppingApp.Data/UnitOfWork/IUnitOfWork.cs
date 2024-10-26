@@ -1,4 +1,6 @@
-﻿using System;
+﻿using OnlineShoppingApp.Data.Entities;
+using OnlineShoppingApp.Data.Repositories;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -13,5 +15,7 @@ namespace OnlineShoppingApp.Data.UnitOfWork
         Task BeginTransaction();
         Task CommitTransaction();
         Task RollBackTransaction();
+
+        IRepository<TEntity> Repository<TEntity>() where TEntity : BaseEntity;
     }
 }

@@ -16,6 +16,7 @@ namespace OnlineShoppingApp.Data.Entities
         public string Email { get; set; } // Benzersiz olacak
         public string PhoneNumber { get; set; }
         public string Password { get; set; } // Şifre korunmalı
+        public DateTime BirthDate { get; set; }
         public Role Role { get; set; }
 
         public virtual ICollection<OrderEntity> Orders { get; set; } // Kullanıcının siparişleri
@@ -40,8 +41,13 @@ namespace OnlineShoppingApp.Data.Entities
                 .IsRequired(false)
                 .HasMaxLength(15);
 
+            builder.Property(x => x.BirthDate) // BirthDate alanını ekliyoruz
+                .IsRequired();
+            builder.Property(x => x.Role)
+           .IsRequired();
             // Diğer konfigürasyonlar
             base.Configure(builder);
         }
     }
+
 }

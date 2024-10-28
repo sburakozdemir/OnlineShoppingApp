@@ -20,6 +20,10 @@ namespace OnlineShoppingApp.Data.Repositories
         IQueryable<TEntity> GetAll(Expression<Func<TEntity, bool>> predicate = null);
         Task AddAsync(TEntity entity);
 
+        Task DeleteAsync(TEntity entity, bool softDelete = true);
+        Task DeleteAsync(int id, bool softDelete = true);
+        Task UpdateAsync(TEntity entity);
+
 
     }
 }

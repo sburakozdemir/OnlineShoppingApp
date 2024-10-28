@@ -14,4 +14,8 @@
     <ProjectReference Include="..\OnlineShoppingApp.Data\OnlineShoppingApp.Data.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Operations\Setting\Dtos\" />
+  </ItemGroup>
+
 </Project>

@@ -50,6 +50,30 @@ namespace OnlineShoppingApp.Data.Repositories
             Delete(entity);
         }
 
+        public async Task DeleteAsync(TEntity entity, bool softDelete = true)
+        {
+            if (softDelete)
+            {
+                entity.ModifiedDate = DateTime.Now;
+                entity.IsDeleted = true;
+                _dbSet.Update(entity);
+            }
+            else
+            {
+                _dbSet.Remove(entity);
+            }
+            await _db.SaveChangesAsync();
+        }
+
+        public async Task DeleteAsync(int id, bool softDelete = true)
+        {
+            var entity = await _dbSet.FindAsync(id);
+            if (entity != null)
+            {
+                await DeleteAsync(entity, softDelete);
+            }
+        }
+
         public TEntity Get(Expression<Func<TEntity, bool>> predicate)
         {
             return _dbSet.FirstOrDefault(predicate);
@@ -82,5 +106,14 @@ namespace OnlineShoppingApp.Data.Repositories
             entity.CreatedDate = DateTime.Now;
             await _dbSet.AddAsync(entity); 
         }
+
+        public async Task UpdateAsync(TEntity entity) // Asenkron güncelleme metodu
+        {
+            entity.ModifiedDate = DateTime.Now;
+            _dbSet.Update(entity);
+            await _db.SaveChangesAsync(); // Değişiklikleri kaydet
+        }
+
+
     }
 }

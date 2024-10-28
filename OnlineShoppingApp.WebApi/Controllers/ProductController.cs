@@ -3,6 +3,7 @@ using OnlineShoppingApp.Business.Services;
 using OnlineShoppingApp.Business.Dtos;
 using System.Threading.Tasks;
 using OnlineShoppingApp.WebApi.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace OnlineShoppingApp.WebApi.Controllers
 {
@@ -19,6 +20,7 @@ namespace OnlineShoppingApp.WebApi.Controllers
 
         // Ürün ekleme
         [HttpPost("add")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> AddProduct(AddProductRequest request)
         {
             if (!ModelState.IsValid)

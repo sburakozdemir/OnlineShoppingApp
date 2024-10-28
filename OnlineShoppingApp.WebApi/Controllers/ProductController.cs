@@ -4,6 +4,7 @@ using OnlineShoppingApp.Business.Dtos;
 using System.Threading.Tasks;
 using OnlineShoppingApp.WebApi.Models;
 using Microsoft.AspNetCore.Authorization;
+using OnlineShoppingApp.WebApi.Filters;
 
 namespace OnlineShoppingApp.WebApi.Controllers
 {
@@ -56,6 +57,7 @@ namespace OnlineShoppingApp.WebApi.Controllers
 
         // Ürün güncelleme
         [HttpPut("update")]
+        
         public async Task<IActionResult> UpdateProduct(UpdateProductRequest request)
         {
             if (!ModelState.IsValid)
@@ -82,6 +84,7 @@ namespace OnlineShoppingApp.WebApi.Controllers
         }
 
         [HttpPatch("{id}/stock")]
+        [TimeControlFilter]
         public async Task<IActionResult> AdjustProductStock(int id, int newStock)
         {
             var result = await _productService.AdjustProductStock(id, newStock);

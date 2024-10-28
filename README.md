@@ -52,11 +52,83 @@ Projenizi yerel ortamda çalıştırmak için aşağıdaki adımları izleyin:
 ## Kullanım
 Uygulama çalıştığında, tarayıcınızdan [http://localhost:5000/swagger](http://localhost:5000/swagger) adresine giderek Swagger UI üzerinden API uç noktalarınızı keşfedebilirsiniz.
 
-### Örnek API Uç Noktaları
-- **Kullanıcı Girişi:** `POST /api/auth/login`
-- **Ürün Ekleme:** `POST /api/product/add`
-- **Ürünleri Listeleme:** `GET /api/product/all`
-- **Sipariş Oluşturma:** `POST /api/order/add`
+## API Uç Noktaları
+
+### Kullanıcı Uç Noktaları
+- **Kullanıcı Girişi**
+  - **Yöntem:** `POST`
+  - **Uç Nokta:** `/api/auth/login`
+  - **Açıklama:** Kullanıcının sisteme giriş yapması için.
+  
+- **Kullanıcı Kayıt**
+  - **Yöntem:** `POST`
+  - **Uç Nokta:** `/api/auth/register`
+  - **Açıklama:** Yeni bir kullanıcı kaydı oluşturur.
+
+### Ürün Uç Noktaları
+- **Ürün Ekleme**
+  - **Yöntem:** `POST`
+  - **Uç Nokta:** `/api/product/add`
+  - **Açıklama:** Yeni bir ürün ekler.
+
+- **Ürün Güncelleme**
+  - **Yöntem:** `PUT`
+  - **Uç Nokta:** `/api/product/update/{id}`
+  - **Açıklama:** Belirtilen ID'ye sahip ürünü günceller.
+
+- **Ürün Silme**
+  - **Yöntem:** `DELETE`
+  - **Uç Nokta:** `/api/product/delete/{id}`
+  - **Açıklama:** Belirtilen ID'ye sahip ürünü siler.
+
+- **Tüm Ürünleri Listeleme**
+  - **Yöntem:** `GET`
+  - **Uç Nokta:** `/api/product/all`
+  - **Açıklama:** Tüm ürünleri listeler.
+
+- **Ürün Detayı**
+  - **Yöntem:** `GET`
+  - **Uç Nokta:** `/api/product/{id}`
+  - **Açıklama:** Belirtilen ID'ye sahip ürünün detaylarını getirir.
+
+### Sipariş Uç Noktaları
+- **Sipariş Oluşturma**
+  - **Yöntem:** `POST`
+  - **Uç Nokta:** `/api/order/add`
+  - **Açıklama:** Yeni bir sipariş oluşturur.
+
+- **Sipariş İptali**
+  - **Yöntem:** `PATCH`
+  - **Uç Nokta:** `/api/order/cancel`
+  - **Açıklama:** Belirtilen siparişi iptal eder.
+
+- **Siparişleri Listeleme**
+  - **Yöntem:** `GET`
+  - **Uç Nokta:** `/api/order/all`
+  - **Açıklama:** Kullanıcıya ait tüm siparişleri listeler.
+
+- **Sipariş Detayı**
+  - **Yöntem:** `GET`
+  - **Uç Nokta:** `/api/order/{id}`
+  - **Açıklama:** Belirtilen ID'ye sahip siparişin detaylarını getirir.
+
+### Ayarlar Uç Noktaları
+- **Bakım Modunu Etkinleştirme**
+  - **Yöntem:** `PATCH`
+  - **Uç Nokta:** `/api/settings`
+  - **Açıklama:** Bakım modunu açar veya kapatır.
+
+- **Bakım Modu Durumunu Öğrenme**
+  - **Yöntem:** `GET`
+  - **Uç Nokta:** `/api/settings/state`
+  - **Açıklama:** Bakım modunun aktif olup olmadığını kontrol eder.
+
+### Swagger Uç Noktası
+- **Swagger UI**
+  - **Yöntem:** `GET`
+  - **Uç Nokta:** `/swagger`
+  - **Açıklama:** API dökümantasyonu için kullanıcı dostu bir arayüz sunar.
+
 
 ## Bakım Modu
 Admin kullanıcılar, sistem bakımında olduğunda kullanıcıların erişimini kontrol etmek için bakım modunu etkinleştirebilirler. Bakım modunun durumu aşağıdaki uç noktalar aracılığıyla yönetilebilir:

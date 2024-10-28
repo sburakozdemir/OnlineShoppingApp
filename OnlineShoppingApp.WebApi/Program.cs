@@ -13,6 +13,7 @@ using OnlineShoppingApp.Business.Services;
 using OnlineShoppingApp.Data.Context;
 using OnlineShoppingApp.Data.Repositories;
 using OnlineShoppingApp.Data.UnitOfWork;
+using OnlineShoppingApp.WebApi.Middlewares;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -106,6 +107,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.UseMaintenanceMode();
 app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();

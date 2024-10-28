@@ -24,5 +24,13 @@ namespace OnlineShoppingApp.WebApi.Controllers
             await _settingService.ToggleMaintenance();
             return Ok();
         }
+
+        [HttpGet("state")]
+        [Authorize(Roles = "Admin")]
+        public IActionResult GetMaintenanceState()
+        {
+            var isMaintenanceMode = _settingService.GetMaintenanceState();
+            return Ok(new { MaintenanceMode = isMaintenanceMode });
+        }
     } 
 }

@@ -11,37 +11,40 @@ namespace OnlineShoppingApp.Business.Operations.Setting
 {
     public class SettingManager : ISettingService
     {
-        private readonly IUnitOfWork _unitOfWork;
-        private readonly IRepository<SettingEntity> _settingRepository;
+        private readonly IUnitOfWork _unitOfWork; // UnitOfWork arayüzü
+        private readonly IRepository<SettingEntity> _settingRepository; // Ayar repository'si
+
+        // Constructor - IUnitOfWork ve IRepository bağımlılıklarını alır
         public SettingManager(IUnitOfWork unitOfWork, IRepository<SettingEntity> settingRepository)
         {
             _unitOfWork = unitOfWork;
             _settingRepository = settingRepository;
-
         }
 
+        // Bakım modunun durumunu al
         public bool GetMaintenanceState()
         {
+            // Ayar repository'sinden bakım durumu bilgisini al
             var maintenanceState = _settingRepository.GetById(1).MaintenanceMode;
-            return maintenanceState;
+            return maintenanceState; // Bakım durumunu döndür
         }
 
+        // Bakım modunu aç/kapat
         public async Task ToggleMaintenance()
         {
+            // Ayar repository'sinden ayarları al
             var setting = _settingRepository.GetById(1);
-            setting.MaintenanceMode = !setting.MaintenanceMode;
-            _settingRepository.Update(setting);
+            setting.MaintenanceMode = !setting.MaintenanceMode; // Mevcut durumu tersine çevir
+            _settingRepository.Update(setting); // Güncellenen ayarları repository'ye uygula
 
             try
             {
-                await _unitOfWork.SaveChangesAsync();
+                await _unitOfWork.SaveChangesAsync(); // Değişiklikleri veritabanına kaydet
             }
             catch (Exception)
             {
-
-                throw new Exception("Bakım durumu güncellenirken bir hata ile karşılaşıldı.");
+                throw new Exception("Bakım durumu güncellenirken bir hata ile karşılaşıldı."); // Hata durumunda özel bir hata fırlat
             }
-
         }
     }
 }

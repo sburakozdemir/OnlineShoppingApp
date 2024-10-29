@@ -8,47 +8,51 @@ using OnlineShoppingApp.Data.UnitOfWork;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-
 namespace OnlineShoppingApp.Business.Operations.Order
 {
+    // OrderService, sipariş işlemleri için gerekli metotları içeren sınıftır
     public class OrderService : IOrderService
     {
         private readonly IUnitOfWork _unitOfWork;
 
+        // Constructor, bir IUnitOfWork nesnesi alır
         public OrderService(IUnitOfWork unitOfWork)
         {
             _unitOfWork = unitOfWork;
         }
 
+        // Yeni bir sipariş eklemek için asenkron metot
         public async Task<ServiceMessage> AddOrderAsync(OrderDto orderDto)
         {
-            await _unitOfWork.BeginTransaction();
+            await _unitOfWork.BeginTransaction(); // İşlem başlat
             try
             {
                 // Yeni sipariş oluştur
                 var order = new OrderEntity
                 {
-                    OrderDate = orderDto.OrderDate,
-                    CustomerId = orderDto.CustomerId,
-                    OrderProducts = new List<OrderProductEntity>()
+                    OrderDate = orderDto.OrderDate, // Sipariş tarihi
+                    CustomerId = orderDto.CustomerId, // Müşteri kimliği
+                    OrderProducts = new List<OrderProductEntity>() // Sipariş ürünleri listesi
                 };
 
-                decimal totalAmount = 0;
+                decimal totalAmount = 0; // Toplam tutar
 
+                // Sipariş ürünlerini ekle
                 foreach (var orderProductDto in orderDto.OrderProducts)
                 {
+                    // Ürünü veritabanından al
                     var product = await _unitOfWork.Repository<ProductEntity>().GetByIdAsync(orderProductDto.ProductId);
                     if (product == null)
                     {
-                        await _unitOfWork.RollBackTransaction();
-                        return new ServiceMessage { IsSucceed = false, Message = "Product not found." };
+                        await _unitOfWork.RollBackTransaction(); // Hata durumunda işlemi geri al
+                        return new ServiceMessage { IsSucceed = false, Message = "Product not found." }; // Ürün bulunamadı mesajı
                     }
 
                     // Stok kontrolü
                     if (product.StockQuantity < orderProductDto.Quantity)
                     {
-                        await _unitOfWork.RollBackTransaction();
-                        return new ServiceMessage { IsSucceed = false, Message = "Insufficient stock for product: " + product.ProductName };
+                        await _unitOfWork.RollBackTransaction(); // Hata durumunda işlemi geri al
+                        return new ServiceMessage { IsSucceed = false, Message = "Insufficient stock for product: " + product.ProductName }; // Yetersiz stok mesajı
                     }
 
                     // Toplam tutara ürün fiyatını ekle
@@ -68,33 +72,32 @@ namespace OnlineShoppingApp.Business.Operations.Order
                     await _unitOfWork.Repository<ProductEntity>().UpdateAsync(product); // Asenkron güncelleme
                 }
 
-                order.TotalAmount = totalAmount;
+                order.TotalAmount = totalAmount; // Toplam tutarı ayarla
 
-                await _unitOfWork.Repository<OrderEntity>().AddAsync(order);
-                await _unitOfWork.SaveChangesAsync();
-                await _unitOfWork.CommitTransaction();
+                await _unitOfWork.Repository<OrderEntity>().AddAsync(order); // Siparişi ekle
+                await _unitOfWork.SaveChangesAsync(); // Değişiklikleri kaydet
+                await _unitOfWork.CommitTransaction(); // İşlemi onayla
 
-                return new ServiceMessage { IsSucceed = true, Message = "Order added successfully." };
+                return new ServiceMessage { IsSucceed = true, Message = "Order added successfully." }; // Başarılı ekleme mesajı
             }
             catch (Exception ex)
             {
-                await _unitOfWork.RollBackTransaction();
-                return new ServiceMessage { IsSucceed = false, Message = "An error occurred while adding the order: " + ex.Message };
+                await _unitOfWork.RollBackTransaction(); // Hata durumunda işlemi geri al
+                return new ServiceMessage { IsSucceed = false, Message = "An error occurred while adding the order: " + ex.Message }; // Hata mesajı
             }
         }
 
-
-
-
+        // Sipariş ID'sine göre siparişi almak için asenkron metot
         public async Task<ServiceMessage<OrderDto>> GetOrderByIdAsync(int orderId)
         {
             var order = await _unitOfWork.Repository<OrderEntity>().GetAll()
-                .Include(o => o.OrderProducts)
-                .ThenInclude(op => op.Product)
-                .FirstOrDefaultAsync(o => o.Id == orderId);
+                .Include(o => o.OrderProducts) // Sipariş ürünlerini dahil et
+                .ThenInclude(op => op.Product) // Ürünleri dahil et
+                .FirstOrDefaultAsync(o => o.Id == orderId); // Belirtilen ID'ye göre siparişi bul
 
-            if (order == null) return new ServiceMessage<OrderDto> { IsSucceed = false, Message = "Order not found." };
+            if (order == null) return new ServiceMessage<OrderDto> { IsSucceed = false, Message = "Order not found." }; // Sipariş bulunamadı mesajı
 
+            // Siparişi DTO'ya dönüştür
             var orderDto = new OrderDto
             {
                 Id = order.Id,
@@ -109,66 +112,70 @@ namespace OnlineShoppingApp.Business.Operations.Order
                 }).ToList()
             };
 
-            return new ServiceMessage<OrderDto> { IsSucceed = true, Data = orderDto };
+            return new ServiceMessage<OrderDto> { IsSucceed = true, Data = orderDto }; // Başarılı durum mesajı ile sipariş DTO'sunu döndür
         }
 
+        // Siparişi güncellemek için asenkron metot
         public async Task<ServiceMessage> UpdateOrderAsync(int id, OrderDto orderDto)
         {
-            await _unitOfWork.BeginTransaction();
+            await _unitOfWork.BeginTransaction(); // İşlem başlat
             try
             {
-                var order = await _unitOfWork.Repository<OrderEntity>().GetAll().FirstOrDefaultAsync(o => o.Id == id);
-                if (order == null) return new ServiceMessage { IsSucceed = false, Message = "Order not found." };
+                var order = await _unitOfWork.Repository<OrderEntity>().GetAll().FirstOrDefaultAsync(o => o.Id == id); // Belirtilen ID'ye göre siparişi bul
+                if (order == null) return new ServiceMessage { IsSucceed = false, Message = "Order not found." }; // Sipariş bulunamadı mesajı
 
-                order.OrderDate = orderDto.OrderDate;
-                order.TotalAmount = orderDto.TotalAmount;
+                order.OrderDate = orderDto.OrderDate; // Sipariş tarihini güncelle
+                order.TotalAmount = orderDto.TotalAmount; // Toplam tutarı güncelle
 
-                await _unitOfWork.SaveChangesAsync();
-                await _unitOfWork.CommitTransaction();
+                await _unitOfWork.SaveChangesAsync(); // Değişiklikleri kaydet
+                await _unitOfWork.CommitTransaction(); // İşlemi onayla
 
-                return new ServiceMessage { IsSucceed = true, Message = "Order updated successfully." };
+                return new ServiceMessage { IsSucceed = true, Message = "Order updated successfully." }; // Başarılı güncelleme mesajı
             }
             catch
             {
-                await _unitOfWork.RollBackTransaction();
-                return new ServiceMessage { IsSucceed = false, Message = "An error occurred while updating the order." };
+                await _unitOfWork.RollBackTransaction(); // Hata durumunda işlemi geri al
+                return new ServiceMessage { IsSucceed = false, Message = "An error occurred while updating the order." }; // Hata mesajı
             }
         }
 
+        // Siparişi silmek için asenkron metot
         public async Task<ServiceMessage> DeleteOrderAsync(int orderId)
         {
-            await _unitOfWork.BeginTransaction();
+            await _unitOfWork.BeginTransaction(); // İşlem başlat
             try
             {
-                var order = await _unitOfWork.Repository<OrderEntity>().GetAll().FirstOrDefaultAsync(o => o.Id == orderId);
-                if (order == null) return new ServiceMessage { IsSucceed = false, Message = "Order not found." };
+                var order = await _unitOfWork.Repository<OrderEntity>().GetAll().FirstOrDefaultAsync(o => o.Id == orderId); // Belirtilen ID'ye göre siparişi bul
+                if (order == null) return new ServiceMessage { IsSucceed = false, Message = "Order not found." }; // Sipariş bulunamadı mesajı
 
-                await _unitOfWork.Repository<OrderEntity>().DeleteAsync(order);
-                await _unitOfWork.SaveChangesAsync();
-                await _unitOfWork.CommitTransaction();
+                await _unitOfWork.Repository<OrderEntity>().DeleteAsync(order); // Siparişi sil
+                await _unitOfWork.SaveChangesAsync(); // Değişiklikleri kaydet
+                await _unitOfWork.CommitTransaction(); // İşlemi onayla
 
-                return new ServiceMessage { IsSucceed = true, Message = "Order deleted successfully." };
+                return new ServiceMessage { IsSucceed = true, Message = "Order deleted successfully." }; // Başarılı silme mesajı
             }
             catch
             {
-                await _unitOfWork.RollBackTransaction();
-                return new ServiceMessage { IsSucceed = false, Message = "An error occurred while deleting the order." };
+                await _unitOfWork.RollBackTransaction(); // Hata durumunda işlemi geri al
+                return new ServiceMessage { IsSucceed = false, Message = "An error occurred while deleting the order." }; // Hata mesajı
             }
         }
 
+        // Tüm siparişleri almak için asenkron metot
         public async Task<ServiceMessage<List<OrderDto>>> GetAllOrdersAsync()
         {
             // Eager loading ile OrderProducts'ı dahil et
             var orders = await _unitOfWork.Repository<OrderEntity>()
                 .GetAll()
                 .Include(o => o.OrderProducts) // OrderProducts'ı dahil et
-                .ToListAsync();
+                .ToListAsync(); // Tüm siparişleri listele
 
             if (orders == null || !orders.Any())
             {
-                return new ServiceMessage<List<OrderDto>> { IsSucceed = false, Message = "No orders found." };
+                return new ServiceMessage<List<OrderDto>> { IsSucceed = false, Message = "No orders found." }; // Sipariş bulunamadı mesajı
             }
 
+            // Siparişleri DTO'ya dönüştür
             var orderDtos = orders.Select(o => new OrderDto
             {
                 Id = o.Id,
@@ -185,66 +192,36 @@ namespace OnlineShoppingApp.Business.Operations.Order
                     : new List<OrderProductDto>() // Eğer null ise boş liste döndür
             }).ToList();
 
-            return new ServiceMessage<List<OrderDto>> { IsSucceed = true, Data = orderDtos };
+            return new ServiceMessage<List<OrderDto>> { IsSucceed = true, Data = orderDtos }; // Başarılı durum mesajı ile sipariş DTO'larını döndür
         }
 
-
+        // Siparişi iptal etmek için asenkron metot
         public async Task<ServiceMessage<CancelOrderDto>> CancelOrderAsync(int orderId)
         {
             var order = await _unitOfWork.Repository<OrderEntity>()
                 .GetAll(o => o.Id == orderId)
-                .Include(o => o.OrderProducts)
+                .Include(o => o.OrderProducts) // Sipariş ürünlerini dahil et
                 .FirstOrDefaultAsync();
 
             if (order == null)
-            {
-                return new ServiceMessage<CancelOrderDto>
-                {
-                    IsSucceed = false,
-                    Message = "Order not found.",
-                    Data = null
-                };
-            }
+                return new ServiceMessage<CancelOrderDto> { IsSucceed = false, Message = "Order not found." }; // Sipariş bulunamadı mesajı
 
-            if (order.OrderProducts != null)
+            // Siparişi iptal et
+            foreach (var orderProduct in order.OrderProducts)
             {
-                foreach (var orderProduct in order.OrderProducts)
+                var product = await _unitOfWork.Repository<ProductEntity>().GetByIdAsync(orderProduct.ProductId);
+                if (product != null)
                 {
-                    var product = await _unitOfWork.Repository<ProductEntity>().GetByIdAsync(orderProduct.ProductId);
-                    if (product != null)
-                    {
-                        product.StockQuantity += orderProduct.Quantity;
-                        await _unitOfWork.Repository<ProductEntity>().UpdateAsync(product);
-                    }
+                    // İade edilen miktarı stok miktarına ekle
+                    product.StockQuantity += orderProduct.Quantity;
+                    await _unitOfWork.Repository<ProductEntity>().UpdateAsync(product); // Ürünü güncelle
                 }
             }
 
-            order.IsDeleted = true; // Soft delete uygulanıyor
-            await _unitOfWork.Repository<OrderEntity>().UpdateAsync(order);
+            await _unitOfWork.Repository<OrderEntity>().DeleteAsync(order); // Siparişi sil
+            await _unitOfWork.SaveChangesAsync(); // Değişiklikleri kaydet
 
-            await _unitOfWork.SaveChangesAsync();
-
-            return new ServiceMessage<CancelOrderDto>
-            {
-                IsSucceed = true,
-                Message = "Order cancelled successfully.",
-                Data = new CancelOrderDto
-                {
-                    OrderId = order.Id,
-                    IsCanceled = true,
-                    Message = "Order has been cancelled and stock updated."
-                }
-            };
+            return new ServiceMessage<CancelOrderDto> { IsSucceed = true, Message = "Order canceled successfully." }; // Başarılı iptal mesajı
         }
-
-
-
-
-
-
-
-
-
-
     }
 }

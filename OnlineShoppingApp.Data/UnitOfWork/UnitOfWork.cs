@@ -10,48 +10,53 @@ using System.Threading.Tasks;
 
 namespace OnlineShoppingApp.Data.UnitOfWork
 {
+    // Unit of Work deseni uygulayan sınıf
     public class UnitOfWork : IUnitOfWork
     {
-        private readonly OnlineShoppingAppDbContext _db;
-        private IDbContextTransaction _transaction;
+        private readonly OnlineShoppingAppDbContext _db; // Veritabanı bağlamı
+        private IDbContextTransaction _transaction; // İşlem durumu
+
         public UnitOfWork(OnlineShoppingAppDbContext db)
         {
-            _db = db;
-
+            _db = db; // Veritabanı bağlamını atama
         }
+
+        // İşleme başlama metodu
         public async Task BeginTransaction()
         {
-            _transaction = await _db.Database.BeginTransactionAsync();
+            _transaction = await _db.Database.BeginTransactionAsync(); // Yeni bir işlem başlat
         }
 
+        // İşlemi tamamlama metodu
         public async Task CommitTransaction()
         {
-            await _transaction.CommitAsync();
-
+            await _transaction.CommitAsync(); // İşlemi onayla
         }
 
+        // Dispose metodu, kaynakları serbest bırakma
         public void Dispose()
         {
-            _db.Dispose();
-            //Garbage Collecter'a sen bunu temizleyebilirsin iznini verdiğimiz yer
-            //o an silmiyoruz - silinebilir yapıyoruz . Rami temizleme ihtiyacında öncelikli olacaklar
-
-            //direk çalıştırmak istersek GC.Collect();
+            _db.Dispose(); // Veritabanı bağlamını serbest bırak
+            // Garbage Collector'a temizleme izni verilir
+            // İsteğe bağlı olarak GC.Collect() ile zorlayabilirsiniz
         }
 
+        // İşlemi geri alma metodu
         public async Task RollBackTransaction()
         {
-            await _transaction.RollbackAsync();
+            await _transaction.RollbackAsync(); // İşlemi geri al
         }
 
+        // Değişiklikleri kaydetme metodu
         public async Task<int> SaveChangesAsync()
         {
-            return await _db.SaveChangesAsync();
+            return await _db.SaveChangesAsync(); // Değişiklikleri kaydet
         }
 
+        // Generic repository döndürme metodu
         public IRepository<TEntity> Repository<TEntity>() where TEntity : BaseEntity
         {
-            return new Repository<TEntity>(_db);
+            return new Repository<TEntity>(_db); // İlgili repository'yi oluştur
         }
     }
 }

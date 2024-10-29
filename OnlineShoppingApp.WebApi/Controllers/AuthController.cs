@@ -13,20 +13,21 @@ namespace OnlineShoppingApp.WebApi.Controllers
     [ApiController]
     public class AuthController : ControllerBase
     {
-        private readonly IUserService _userService;
-        private readonly IConfiguration _configuration;
+        private readonly IUserService _userService; // Kullanıcı servisinin referansı
+        private readonly IConfiguration _configuration; // Yapılandırma ayarları
 
         public AuthController(IUserService userService, IConfiguration configuration)
         {
-            _userService = userService;
-            _configuration = configuration;
+            _userService = userService; // Kullanıcı servisinin ataması
+            _configuration = configuration; // Yapılandırma ayarlarının ataması
         }
 
+        // Kullanıcı kaydı için endpoint
         [HttpPost("register")]
         public async Task<IActionResult> Register(RegisterRequest request)
         {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
+            if (!ModelState.IsValid) // Modelin geçerli olup olmadığını kontrol et
+                return BadRequest(ModelState); // Hatalıysa BadRequest döndür
 
             var result = await _userService.RegisterUser(new RegisterUserDto
             {
@@ -38,14 +39,16 @@ namespace OnlineShoppingApp.WebApi.Controllers
                 BirthDate = request.BirthDate
             });
 
+            // Kullanıcı kaydı sonucuna göre uygun yanıtı döndür
             return result.IsSucceed ? Ok() : BadRequest(result.Message);
         }
 
+        // Kullanıcı girişi için endpoint
         [HttpPost("login")]
         public IActionResult Login(LoginRequest request)
         {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
+            if (!ModelState.IsValid) // Modelin geçerli olup olmadığını kontrol et
+                return BadRequest(ModelState); // Hatalıysa BadRequest döndür
 
             var result = _userService.LoginUser(new LoginUserDto
             {
@@ -53,10 +56,11 @@ namespace OnlineShoppingApp.WebApi.Controllers
                 Password = request.Password
             });
 
+            // Giriş işlemi sonucuna göre uygun yanıtı döndür
             if (!result.IsSucceed)
                 return BadRequest(result.Message);
 
-            var user = result.Data;
+            var user = result.Data; // Kullanıcı bilgilerini al
             var token = JwtHelper.GenerateJwtToken(new JwtDto
             {
                 Id = user.Id,
@@ -70,6 +74,7 @@ namespace OnlineShoppingApp.WebApi.Controllers
                 ExpireMinutes = int.Parse(_configuration["Jwt:ExpireMinutes"])
             });
 
+            // Giriş başarılıysa token ile birlikte yanıt döndür
             return Ok(new LoginResponse
             {
                 Message = "Login successful",
@@ -77,11 +82,12 @@ namespace OnlineShoppingApp.WebApi.Controllers
             });
         }
 
+        // Kullanıcı bilgilerini almak için endpoint
         [HttpGet("me")]
-        [Authorize]
+        [Authorize] // Yetkilendirme gerektirir
         public IActionResult GetMyUser()
         {
-            return Ok(); // Kullanıcı bilgilerini döndürebilirsin
+            return Ok();
         }
     }
 }

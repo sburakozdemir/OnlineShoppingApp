@@ -7,5 +7,10 @@
             return app.UseMiddleware<MaintenanceMiddleware>();
         }
 
+        public static IApplicationBuilder UseExceptionHandling(this IApplicationBuilder app)
+        {
+            return app.UseMiddleware<ExceptionHandlingMiddleware>();
+        }
+
     }
 }

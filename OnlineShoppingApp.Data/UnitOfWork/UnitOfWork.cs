@@ -38,7 +38,7 @@ namespace OnlineShoppingApp.Data.UnitOfWork
         {
             _db.Dispose(); // Veritabanı bağlamını serbest bırak
             // Garbage Collector'a temizleme izni verilir
-            // İsteğe bağlı olarak GC.Collect() ile zorlayabilirsiniz
+            
         }
 
         // İşlemi geri alma metodu

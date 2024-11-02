@@ -100,6 +100,7 @@ if (app.Environment.IsDevelopment())
 }
 
 // Middleware'leri kullan
+app.UseExceptionHandling();
 app.UseMaintenanceMode();
 app.UseHttpsRedirection();
 app.UseAuthentication();
